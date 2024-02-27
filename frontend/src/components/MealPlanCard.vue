@@ -102,7 +102,7 @@ async function saveSelectedMealPlan(recipe, meal, customDate) {
 <template>
   <div class="outside grid h-100">
     <div class="h-98 card w-100 bg-base-100 shadow-xl">
-      <figure>
+      <figure class="index-1">
         <img class="" :src="recipe.image" :alt="recipe.title" />
       </figure>
       <div class="flex flex-col card-body mt-auto">
@@ -110,16 +110,16 @@ async function saveSelectedMealPlan(recipe, meal, customDate) {
         <div class="flex justify-evenly">
           <details
             v-if="recipe.empty"
-            class="dropdown btn rounded-l-md rounded-r-none w-1/2 hover:bg-blue-400 bg-accent border-0 py-4"
+            class="p-0 dropdown btn rounded-l-md rounded-r-none w-1/2 hover:bg-blue-400 bg-accent border-0"
           >
-            <summary class="">Add</summary>
+            <summary class="p-4">Add</summary>
             <ul class="z-50 p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52">
-              <li class="z-50" v-for="recipe in props.savedRecipes" :key="recipe.id">
+              <li class="z-50" v-for="savedRecipe in props.savedRecipes" :key="savedRecipe.id">
                 <button
-                  @click="saveSelectedMealPlan(recipe, mealPlan, dayPlan.date)"
-                  class="capitalize p-5 block"
+                  @click="saveSelectedMealPlan(savedRecipe, mealPlan, dayPlan.date)"
+                  class="capitalize z-50"
                 >
-                  {{ recipe.title }}
+                  {{ savedRecipe.title }}
                 </button>
               </li>
             </ul>
@@ -146,5 +146,9 @@ async function saveSelectedMealPlan(recipe, meal, customDate) {
 <style scoped>
 .outside {
   height: 100%;
+}
+
+.dropdown-content {
+  z-index: 99999 !important;
 }
 </style>
