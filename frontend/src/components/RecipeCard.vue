@@ -8,7 +8,7 @@
     </div>
     <div v-if="fullyFetched" class="card bg-base-100 shadow-2xl image-full">
       <figure>
-        <img lazyload :alt="recipe.title" :src="recipe.image" class="cover" />
+        <img loading="lazy" :alt="recipe.title" :src="recipe.image" class="cover" />
       </figure>
       <div
         class="mt-auto card-body flex flex-row justify-between bg-green-50 rounded-xl mx-2 mb-3 align-middle glass"
