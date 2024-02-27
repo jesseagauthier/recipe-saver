@@ -41,6 +41,10 @@ function getStartOfWeek(date) {
   return new Date(result.setHours(0, 0, 0, 0))
 }
 
+function getDayOfWeek(date) {
+  return date.toLocaleDateString('en-US', { weekday: 'long' })
+}
+
 function formatDayWithDate(date) {
   const month = months[date.getMonth()]
   const dayOfMonth = date.getDate()
@@ -110,20 +114,26 @@ watch(
 )
 
 const mealPlansForWeek = computed(() => {
-  return weekDates.value.map((date) => ({
-    date,
-    meals: meals.map((meal) => {
-      const formattedDate = formatDateAsMMDDYYYY(parseCustomDateToDateObject(date))
-      const plan = MealPlanStore.mealPlans.find(
-        (plan) => plan.date === formattedDate && plan.meal === meal
-      )
+  return weekDates.value.map((date) => {
+    const dateObject = parseCustomDateToDateObject(date)
+    const formattedDate = formatDateAsMMDDYYYY(dateObject)
+    const dayOfWeek = getDayOfWeek(dateObject)
 
-      return {
-        type: meal,
-        plan: plan
-      }
-    })
-  }))
+    return {
+      date,
+      dayOfWeek,
+      meals: meals.map((meal) => {
+        const plan = MealPlanStore.mealPlans.find(
+          (plan) => plan.date === formattedDate && plan.meal === meal
+        )
+
+        return {
+          type: meal,
+          plan: plan
+        }
+      })
+    }
+  })
 })
 
 function navigateWeeks(direction) {
@@ -160,67 +170,71 @@ function formatDate(date) {
     <header class="mb-3 py-5">
       <div class="flex flex-col gap-5 justify-center text-center">
         <h2 class="text-5xl font-bold">Meal Planner</h2>
-        <div class="flex justify-center gap-48 flex-col md:flex-row mt-4">
-          <svg
-            class="w-[70px] p-3 bg-success rounded-full"
-            @click="navigateWeeks(-1)"
-            width="100%"
-            height="100%"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            transform="rotate(180)"
-          >
-            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-            <g id="SVGRepo_iconCarrier">
-              <path
-                d="M5.5 5L11.7929 11.2929C12.1834 11.6834 12.1834 12.3166 11.7929 12.7071L5.5 19"
-                stroke="#000000"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              ></path>
-              <path
-                d="M13.5 5L19.7929 11.2929C20.1834 11.6834 20.1834 12.3166 19.7929 12.7071L13.5 19"
-                stroke="#000000"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              ></path>
-            </g>
-          </svg>
-          <div class="text-center">{{ previousSunday }}</div>
-          <svg
-            class="w-[70px] p-3 bg-success rounded-full"
-            @click="navigateWeeks(1)"
-            width="100%"
-            height="100%"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            transform="rotate(0)"
-          >
-            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-            <g id="SVGRepo_iconCarrier">
-              <path
-                d="M5.5 5L11.7929 11.2929C12.1834 11.6834 12.1834 12.3166 11.7929 12.7071L5.5 19"
-                stroke="#000000"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              ></path>
-              <path
-                d="M13.5 5L19.7929 11.2929C20.1834 11.6834 20.1834 12.3166 19.7929 12.7071L13.5 19"
-                stroke="#000000"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              ></path>
-            </g>
-          </svg>
-          <div class="text-center">{{ nextSunday }}</div>
+        <div class="flex justify-center gap-24 md:gap-48 mt-4">
+          <div class="flex flex-col justify-center">
+            <svg
+              class="mx-auto w-[70px] p-3 bg-success rounded-full cursor-pointer hover:bg-[#8da797]"
+              @click="navigateWeeks(-1)"
+              width="100%"
+              height="75%"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              transform="rotate(180)"
+            >
+              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+              <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+              <g id="SVGRepo_iconCarrier">
+                <path
+                  d="M5.5 5L11.7929 11.2929C12.1834 11.6834 12.1834 12.3166 11.7929 12.7071L5.5 19"
+                  stroke="#000000"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                ></path>
+                <path
+                  d="M13.5 5L19.7929 11.2929C20.1834 11.6834 20.1834 12.3166 19.7929 12.7071L13.5 19"
+                  stroke="#000000"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                ></path>
+              </g>
+            </svg>
+            <div class="text-center">{{ previousSunday }}</div>
+          </div>
+          <div class="flex flex-col justify-center">
+            <svg
+              class="mx-auto w-[70px] p-3 bg-success rounded-full cursor-pointer hover:bg-[#8da797]"
+              @click="navigateWeeks(1)"
+              width="100%"
+              height="75%"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              transform="rotate(0)"
+            >
+              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+              <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+              <g id="SVGRepo_iconCarrier">
+                <path
+                  d="M5.5 5L11.7929 11.2929C12.1834 11.6834 12.1834 12.3166 11.7929 12.7071L5.5 19"
+                  stroke="#000000"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                ></path>
+                <path
+                  d="M13.5 5L19.7929 11.2929C20.1834 11.6834 20.1834 12.3166 19.7929 12.7071L13.5 19"
+                  stroke="#000000"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                ></path>
+              </g>
+            </svg>
+            <div class="text-center">{{ nextSunday }}</div>
+          </div>
         </div>
       </div>
     </header>
@@ -231,7 +245,10 @@ function formatDate(date) {
         class="bg-blue-100 p-4 rounded-2xl shadow"
       >
         <div class="day md:p-3">
-          <h3 class="font-bold text-3xl">{{ dayPlan.date }}</h3>
+          <h3 class="font-bold text-3xl">
+            <span class="block text-md font-light my-2">{{ dayPlan.dayOfWeek }}</span>
+            {{ dayPlan.date }}
+          </h3>
           <div class="grid grid-cols-1 md:grid-cols-8 gap-4 gap-y-5 mt-5">
             <div
               v-for="mealPlan in dayPlan.meals"
