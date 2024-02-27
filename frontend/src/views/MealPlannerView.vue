@@ -131,6 +131,28 @@ function navigateWeeks(direction) {
   currentDate.setDate(currentDate.getDate() + direction * 7)
   selectedDate.value = new Date(currentDate) // Ensure Vue reacts to this change
 }
+
+function getPreviousSunday(date) {
+  const startOfWeek = getStartOfWeek(date)
+  const newDate = new Date(startOfWeek.setDate(startOfWeek.getDate() - 7))
+  return formatDate(newDate)
+}
+
+function getNextSunday(date) {
+  const startOfWeek = getStartOfWeek(date)
+  const NewDate = new Date(startOfWeek.setDate(startOfWeek.getDate() + 7))
+  return formatDate(NewDate)
+}
+
+const previousSunday = computed(() => getPreviousSunday(selectedDate.value))
+const nextSunday = computed(() => getNextSunday(selectedDate.value))
+
+function formatDate(date) {
+  return date.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric'
+  })
+}
 </script>
 
 <template>
@@ -168,7 +190,7 @@ function navigateWeeks(direction) {
               ></path>
             </g>
           </svg>
-
+          <div class="text-center">{{ previousSunday }}</div>
           <svg
             class="w-[70px] p-3 bg-success rounded-full"
             @click="navigateWeeks(1)"
@@ -198,6 +220,7 @@ function navigateWeeks(direction) {
               ></path>
             </g>
           </svg>
+          <div class="text-center">{{ nextSunday }}</div>
         </div>
       </div>
     </header>
@@ -231,6 +254,4 @@ function navigateWeeks(direction) {
   </div>
 </template>
 
-<style scoped>
-/* Add your styles here */
-</style>
+<style scoped></style>
