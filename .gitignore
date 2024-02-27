@@ -1,0 +1,17 @@
+# Ignore all .log files in any folder
+*.log
+
+# Ignore specific directories (and their subdirectories)
+node_modules/
+dist/
+build/
+.tmp/
+
+# Ignore specific file types in any folder
+*.tmp
+*.bak
+*.swp
+
+# Ignore specific files in any folder
+
+*.env
