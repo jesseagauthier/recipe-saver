@@ -69,7 +69,10 @@ async function saveSelectedMealPlan(recipe, meal, customDate) {
 </script>
 
 <template>
-  <div class="outside grid h-100">
+  <div class="outside grid h-100 pt-0">
+    <h3 class="card capitalize py-3 px-5 text-2xl text-center my-4 bg-blue-100 mx-auto">
+      {{ recipe.meal }}
+    </h3>
     <div class="h-98 card w-100 bg-base-100 shadow-xl">
       <figure class="index-1">
         <img class="" :src="recipe.image" :alt="recipe.title" />
