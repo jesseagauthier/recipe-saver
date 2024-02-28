@@ -95,13 +95,11 @@ function navigateWeeks(direction) {
 
 const formatDate = (date) => format(date, 'MMMM do')
 
-const previousSunday = computed(() => {
-  return formatDate(subDays(getStartOfWeek(selectedDate.value), 1))
-})
+const previousMonday = computed(() => formatDate(subDays(getStartOfWeek(selectedDate.value), 7)))
 
-const nextSunday = computed(() => {
-  return formatDate(addDays(getStartOfWeek(addDays(selectedDate.value, 7)), 6))
-})
+const nextMonday = computed(() =>
+  formatDate(addDays(getStartOfWeek(addDays(selectedDate.value, 7)), 0))
+)
 </script>
 
 <template>
@@ -140,7 +138,7 @@ const nextSunday = computed(() => {
                 ></path>
               </g>
             </svg>
-            <div class="text-center">{{ previousSunday }}</div>
+            <div class="text-center">{{ previousMonday }}</div>
           </div>
           <div class="flex flex-col justify-center">
             <svg
@@ -172,7 +170,7 @@ const nextSunday = computed(() => {
                 ></path>
               </g>
             </svg>
-            <div class="text-center">{{ nextSunday }}</div>
+            <div class="text-center">{{ nextMonday }}</div>
           </div>
         </div>
       </div>
