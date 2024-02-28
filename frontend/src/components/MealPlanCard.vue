@@ -1,10 +1,12 @@
 <script setup>
-import { computed, defineProps, ref } from 'vue'
+import { defineProps, ref, computed } from 'vue'
+import { startOfWeek, addDays, format } from 'date-fns'
 import { useSavedRecipesStore } from '@/stores/savedRecipes.js'
 import { useMealPlanStore } from '@/stores/mealPlan.js'
 
 const savedRecipesStore = useSavedRecipesStore()
 const MealPlanStore = useMealPlanStore()
+
 const props = defineProps({
   recipe: {
     type: Object,
@@ -31,64 +33,31 @@ const props = defineProps({
     required: true
   }
 })
-const months = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December'
-]
-const selectedDate = ref(new Date()) // Initialize with the current date
+
+const selectedDate = ref(new Date())
 const recipe = computed(() => props.recipe)
 
 function getStartOfWeek(date) {
-  const result = new Date(date)
-  const day = result.getDay()
-  const diff = result.getDate() - day + (day === 0 ? -6 : 0)
-  result.setDate(diff)
-  return new Date(result.setHours(0, 0, 0, 0))
-}
-
-function parseCustomDateToDateObject(customDate) {
-  const parts = customDate.split(' ')
-  const month = months.indexOf(parts[0])
-  const day = parseInt(parts[1], 10)
-  const year = new Date().getFullYear()
-  return new Date(year, month, day)
+  return startOfWeek(date, { weekStartsOn: 1 })
 }
 
 function formatDateAsMMDDYYYY(date) {
-  const d = new Date(date)
-  const month = `${d.getMonth() + 1}`.padStart(2, '0')
-  const day = `${d.getDate()}`.padStart(2, '0')
-  const year = d.getFullYear()
-  return `${month}/${day}/${year}`
+  return format(date, 'MM/dd/yyyy')
 }
 
 function updateMealPlansForWeek() {
   const userId = props.loggedUser.id
-  const startOfWeek = getStartOfWeek(selectedDate.value)
-  const endOfWeek = new Date(startOfWeek)
-  endOfWeek.setDate(endOfWeek.getDate() + 6)
-  const formattedStart = formatDateAsMMDDYYYY(startOfWeek)
-  const formattedEnd = formatDateAsMMDDYYYY(endOfWeek)
+  const start = getStartOfWeek(selectedDate.value)
+  const end = addDays(start, 6)
+  const formattedStart = formatDateAsMMDDYYYY(start)
+  const formattedEnd = formatDateAsMMDDYYYY(end)
   MealPlanStore.fetchMealPlansForWeek(formattedStart, formattedEnd, userId)
 }
 
 async function saveSelectedMealPlan(recipe, meal, customDate) {
-  const dateObject = parseCustomDateToDateObject(customDate)
-  const formattedDate = formatDateAsMMDDYYYY(dateObject)
-
   recipe.recipeId = recipe.id
-  recipe.meal = props.mealPlan.type
-  recipe.date = formattedDate
+  recipe.meal = meal.type
+  recipe.date = customDate
 
   try {
     await MealPlanStore.saveMealPlan(recipe)
@@ -110,13 +79,13 @@ async function saveSelectedMealPlan(recipe, meal, customDate) {
         <div class="flex justify-evenly">
           <details
             v-if="recipe.empty"
-            class="p-0 dropdown btn rounded-l-md rounded-r-none w-1/2 hover:bg-blue-400 bg-accent border-0"
+            class="noanimation p-0 dropdown btn rounded-l-md rounded-r-none w-1/2 hover:bg-blue-400 bg-accent border-0"
           >
             <summary class="p-4">Add</summary>
             <ul class="z-50 p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52">
               <li class="z-50" v-for="savedRecipe in props.savedRecipes" :key="savedRecipe.id">
                 <button
-                  @click="saveSelectedMealPlan(savedRecipe, mealPlan, dayPlan.date)"
+                  @click="saveSelectedMealPlan(savedRecipe, mealPlan, dayPlan.fullDate)"
                   class="capitalize z-50"
                 >
                   {{ savedRecipe.title }}
@@ -150,5 +119,10 @@ async function saveSelectedMealPlan(recipe, meal, customDate) {
 
 .dropdown-content {
   z-index: 99999 !important;
+}
+
+.noanimation {
+  animation: none !important;
+  transform: none !important;
 }
 </style>

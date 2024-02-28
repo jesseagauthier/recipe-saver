@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@kinde-oss/kinde-auth-pkce-js": "^3.0.28",
+    "date-fns": "^3.3.1",
     "normalize.css": "^8.0.1",
     "pinia": "^2.1.7",
     "primeicons": "^6.0.1",

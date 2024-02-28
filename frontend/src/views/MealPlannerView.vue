@@ -3,9 +3,10 @@ import { computed, onMounted, ref, watch } from 'vue'
 import MealPlanCard from '../components/MealPlanCard.vue'
 import { useSavedRecipesStore } from '@/stores/savedRecipes.js'
 import { useMealPlanStore } from '@/stores/mealPlan.js'
+import { startOfWeek, add, format, parse, subDays, addDays } from 'date-fns'
 
-const selectedDate = ref(new Date()) // Initialize with the current date
-const weekDates = ref([]) // Array to store the formatted dates for the week
+const selectedDate = ref(new Date())
+const weekDates = ref([])
 const savedRecipesStore = useSavedRecipesStore()
 const MealPlanStore = useMealPlanStore()
 const savedRecipes = computed(() => savedRecipesStore.recipes)
@@ -18,81 +19,30 @@ const props = defineProps({
 })
 
 const meals = ['breakfast', 'lunch', 'dinner', 'snack']
-const months = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December'
-]
 
 function getStartOfWeek(date) {
-  const result = new Date(date)
-  const day = result.getDay()
-  const diff = result.getDate() - day + (day === 0 ? -6 : 0)
-  result.setDate(diff)
-  return new Date(result.setHours(0, 0, 0, 0))
-}
-
-function getDayOfWeek(date) {
-  return date.toLocaleDateString('en-US', { weekday: 'long' })
-}
-
-function formatDayWithDate(date) {
-  const month = months[date.getMonth()]
-  const dayOfMonth = date.getDate()
-  const ordinal = getOrdinalIndicator(dayOfMonth)
-  return `${month} ${ordinal} `
-}
-
-function getOrdinalIndicator(day) {
-  const j = day % 10,
-    k = day % 100
-  if (j === 1 && k !== 11) return day + 'st'
-  if (j === 2 && k !== 12) return day + 'nd'
-  if (j === 3 && k !== 13) return day + 'rd'
-  return day + 'th'
+  return startOfWeek(date, { weekStartsOn: 1 })
 }
 
 function updateWeekDates(date) {
-  const startOfWeek = getStartOfWeek(date)
-  weekDates.value = []
-  for (let i = 0; i < 7; i++) {
-    const day = new Date(startOfWeek)
-    day.setDate(day.getDate() + i)
-    const formatted = formatDayWithDate(day)
-    weekDates.value.push(formatted)
-  }
-}
-
-function parseCustomDateToDateObject(customDate) {
-  const parts = customDate.split(' ')
-  const month = months.indexOf(parts[0])
-  const day = parseInt(parts[1], 10)
-  const year = new Date().getFullYear()
-  return new Date(year, month, day)
+  const start = getStartOfWeek(date)
+  weekDates.value = Array.from({ length: 7 }).map((_, i) => {
+    const currentDate = add(start, { days: i })
+    return {
+      displayDate: format(currentDate, 'MMMM do'), // for display
+      dataDate: format(currentDate, 'MM/dd/yyyy') // for data manipulation
+    }
+  })
 }
 
 function formatDateAsMMDDYYYY(date) {
-  const d = new Date(date)
-  const month = `${d.getMonth() + 1}`.padStart(2, '0')
-  const day = `${d.getDate()}`.padStart(2, '0')
-  const year = d.getFullYear()
-  return `${month}/${day}/${year}`
+  return format(date, 'MM/dd/yyyy')
 }
 
 function updateMealPlansForWeek() {
   const userId = props.loggedUser.id
   const startOfWeek = getStartOfWeek(selectedDate.value)
-  const endOfWeek = new Date(startOfWeek)
-  endOfWeek.setDate(endOfWeek.getDate() + 6)
+  const endOfWeek = add(startOfWeek, { days: 6 })
   const formattedStart = formatDateAsMMDDYYYY(startOfWeek)
   const formattedEnd = formatDateAsMMDDYYYY(endOfWeek)
   MealPlanStore.fetchMealPlansForWeek(formattedStart, formattedEnd, userId)
@@ -114,22 +64,24 @@ watch(
 )
 
 const mealPlansForWeek = computed(() => {
-  return weekDates.value.map((date) => {
-    const dateObject = parseCustomDateToDateObject(date)
-    const formattedDate = formatDateAsMMDDYYYY(dateObject)
-    const dayOfWeek = getDayOfWeek(dateObject)
+  return weekDates.value.map(({ displayDate, dataDate }) => {
+    const dayOfWeek = format(parse(dataDate, 'MM/dd/yyyy', new Date()), 'EEEE')
+
+    const fullDate = dataDate
 
     return {
-      date,
-      dayOfWeek,
+      date: displayDate, // For display in the UI
+      dayOfWeek, // Day of the week, e.g., "Monday"
+      fullDate, // The full date in "MM/DD/YYYY" format for any data manipulation or logic
       meals: meals.map((meal) => {
+        // Find the meal plan that matches the current date and meal type
         const plan = MealPlanStore.mealPlans.find(
-          (plan) => plan.date === formattedDate && plan.meal === meal
+          (plan) => plan.date === dataDate && plan.meal === meal
         )
 
         return {
-          type: meal,
-          plan: plan
+          type: meal, // e.g., "breakfast", "lunch", etc.
+          plan: plan // The meal plan object
         }
       })
     }
@@ -138,31 +90,18 @@ const mealPlansForWeek = computed(() => {
 
 function navigateWeeks(direction) {
   const currentDate = new Date(selectedDate.value)
-  currentDate.setDate(currentDate.getDate() + direction * 7)
-  selectedDate.value = new Date(currentDate) // Ensure Vue reacts to this change
+  selectedDate.value = add(currentDate, { weeks: direction })
 }
 
-function getPreviousSunday(date) {
-  const startOfWeek = getStartOfWeek(date)
-  const newDate = new Date(startOfWeek.setDate(startOfWeek.getDate() - 7))
-  return formatDate(newDate)
-}
+const formatDate = (date) => format(date, 'MMMM do')
 
-function getNextSunday(date) {
-  const startOfWeek = getStartOfWeek(date)
-  const NewDate = new Date(startOfWeek.setDate(startOfWeek.getDate() + 7))
-  return formatDate(NewDate)
-}
+const previousSunday = computed(() => {
+  return formatDate(subDays(getStartOfWeek(selectedDate.value), 1))
+})
 
-const previousSunday = computed(() => getPreviousSunday(selectedDate.value))
-const nextSunday = computed(() => getNextSunday(selectedDate.value))
-
-function formatDate(date) {
-  return date.toLocaleDateString('en-US', {
-    month: 'long',
-    day: 'numeric'
-  })
-}
+const nextSunday = computed(() => {
+  return formatDate(addDays(getStartOfWeek(addDays(selectedDate.value, 7)), 6))
+})
 </script>
 
 <template>
@@ -250,20 +189,16 @@ function formatDate(date) {
             {{ dayPlan.date }}
           </h3>
           <div class="grid grid-cols-1 md:grid-cols-8 gap-4 gap-y-5 mt-5">
-            <div
-              v-for="mealPlan in dayPlan.meals"
-              :key="mealPlan.type"
+            <MealPlanCard
               class="col-span-2 bg-white p-3 rounded-xl"
-            >
-              <MealPlanCard
-                v-if="!savedRecipesStore.isLoading"
-                :loggedUser="loggedUser"
-                :savedRecipes="savedRecipes"
-                :mealPlan="mealPlan"
-                :dayPlan="dayPlan"
-                :recipe="mealPlan.plan"
-              />
-            </div>
+              v-for="(mealPlan, index) in dayPlan.meals"
+              :key="index"
+              :loggedUser="loggedUser"
+              :savedRecipes="savedRecipes"
+              :mealPlan="mealPlan"
+              :dayPlan="dayPlan"
+              :recipe="mealPlan.plan"
+            />
           </div>
         </div>
       </div>
