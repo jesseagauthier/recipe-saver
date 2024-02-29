@@ -47,15 +47,21 @@ function updateMealPlansForWeek() {
   const formattedEnd = formatDateAsMMDDYYYY(endOfWeek)
   MealPlanStore.fetchMealPlansForWeek(formattedStart, formattedEnd, userId)
 }
+function updateSelectedDateToMonday() {
+  const currentDate = new Date(selectedDate.value)
+  selectedDate.value = startOfWeek(currentDate, { weekStartsOn: 1 })
+}
 
 onMounted(async () => {
   await savedRecipesStore.fetchSavedRecipes(props.loggedUser.id)
+  updateSelectedDateToMonday()
   updateWeekDates(selectedDate.value)
   updateMealPlansForWeek()
 })
 
 watch(
   selectedDate,
+
   () => {
     updateWeekDates(selectedDate.value)
     updateMealPlansForWeek()
@@ -90,7 +96,9 @@ const mealPlansForWeek = computed(() => {
 
 function navigateWeeks(direction) {
   const currentDate = new Date(selectedDate.value)
-  selectedDate.value = add(currentDate, { weeks: direction })
+  const newWeekDate = add(currentDate, { weeks: direction })
+  selectedDate.value = startOfWeek(newWeekDate, { weekStartsOn: 1 })
+  console.log(selectedDate)
 }
 
 const formatDate = (date) => format(date, 'MMMM do')
@@ -196,6 +204,7 @@ const nextMonday = computed(() =>
               :mealPlan="mealPlan"
               :dayPlan="dayPlan"
               :recipe="mealPlan.plan"
+              :selected-date="selectedDate"
             />
           </div>
         </div>

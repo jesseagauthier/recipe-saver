@@ -1,10 +1,10 @@
 <script setup>
 import { defineProps, ref, computed } from 'vue'
 import { startOfWeek, addDays, format } from 'date-fns'
-import { useSavedRecipesStore } from '@/stores/savedRecipes.js'
+// import { useSavedRecipesStore } from '@/stores/savedRecipes.js'
 import { useMealPlanStore } from '@/stores/mealPlan.js'
 
-const savedRecipesStore = useSavedRecipesStore()
+// const savedRecipesStore = useSavedRecipesStore()
 const MealPlanStore = useMealPlanStore()
 
 const props = defineProps({
@@ -31,10 +31,13 @@ const props = defineProps({
   loggedUser: {
     type: Object,
     required: true
+  },
+  selectedDate: {
+    type: Date,
+    required: true
   }
 })
 
-const selectedDate = ref(new Date())
 const recipe = computed(() => props.recipe)
 
 function getStartOfWeek(date) {
@@ -45,10 +48,11 @@ function formatDateAsMMDDYYYY(date) {
   return format(date, 'MM/dd/yyyy')
 }
 
-function updateMealPlansForWeek() {
+function updateMealPlansForWeek(selectedDate) {
   const userId = props.loggedUser.id
-  const start = getStartOfWeek(selectedDate.value)
+  const start = getStartOfWeek(selectedDate)
   const end = addDays(start, 6)
+  console.log(start, end)
   const formattedStart = formatDateAsMMDDYYYY(start)
   const formattedEnd = formatDateAsMMDDYYYY(end)
   MealPlanStore.fetchMealPlansForWeek(formattedStart, formattedEnd, userId)
@@ -61,7 +65,7 @@ async function saveSelectedMealPlan(recipe, meal, customDate) {
 
   try {
     await MealPlanStore.saveMealPlan(recipe)
-    updateMealPlansForWeek()
+    updateMealPlansForWeek(props.selectedDate)
   } catch (error) {
     console.error('Failed to save or update meal plan:', error)
   }
