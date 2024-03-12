@@ -114,6 +114,13 @@ const deleteMealPlan = async (mealPlanId) => {
   await MealPlanStore.deleteMealPlan(mealPlanId)
   updateMealPlansForWeek()
 }
+
+function resetToCurrentWeek() {
+  selectedDate.value = new Date() // Reset to the current date
+  updateSelectedDateToMonday() // Ensure it's set to the start of the week
+  updateWeekDates(selectedDate.value) // Update the week dates displayed
+  updateMealPlansForWeek() // Refresh the meal plans for the current week
+}
 </script>
 
 <template>
@@ -121,7 +128,7 @@ const deleteMealPlan = async (mealPlanId) => {
     <header class="mb-3 py-5">
       <div class="flex flex-col gap-5 justify-center text-center">
         <h2 class="text-5xl font-bold">Meal Planner</h2>
-        <div class="flex justify-center gap-24 md:gap-48 mt-4">
+        <div class="flex justify-center gap-[100px] mt-4">
           <div class="flex flex-col justify-center">
             <svg
               class="mx-auto w-[70px] p-3 bg-success rounded-full cursor-pointer hover:bg-[#8da797]"
@@ -154,6 +161,12 @@ const deleteMealPlan = async (mealPlanId) => {
             </svg>
             <div class="text-center">{{ previousMonday }}</div>
           </div>
+          <button
+            class="btn w-[10%] my-auto hover:bg-blue-400 bg-accent"
+            @click="resetToCurrentWeek"
+          >
+            Reset
+          </button>
           <div class="flex flex-col justify-center">
             <svg
               class="mx-auto w-[70px] p-3 bg-success rounded-full cursor-pointer hover:bg-[#8da797]"
