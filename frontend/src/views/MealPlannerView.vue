@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-template-shadow -->
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
 import MealPlanCard from '../components/MealPlanCard.vue'
@@ -108,6 +109,11 @@ const previousMonday = computed(() => formatDate(subDays(getStartOfWeek(selected
 const nextMonday = computed(() =>
   formatDate(addDays(getStartOfWeek(addDays(selectedDate.value, 7)), 0))
 )
+
+const deleteMealPlan = async (mealPlanId) => {
+  await MealPlanStore.deleteMealPlan(mealPlanId)
+  updateMealPlansForWeek()
+}
 </script>
 
 <template>
@@ -199,12 +205,13 @@ const nextMonday = computed(() =>
               class="col-span-2 bg-white p-3 rounded-xl"
               v-for="(mealPlan, index) in dayPlan.meals"
               :key="index"
-              :loggedUser="loggedUser"
-              :savedRecipes="savedRecipes"
-              :mealPlan="mealPlan"
-              :dayPlan="dayPlan"
+              :logged-user="loggedUser"
+              :saved-recipes="savedRecipes"
+              :meal-plan="mealPlan"
+              :day-plan="dayPlan"
               :recipe="mealPlan.plan"
               :selected-date="selectedDate"
+              :delete-meal-plan="deleteMealPlan"
             />
           </div>
         </div>

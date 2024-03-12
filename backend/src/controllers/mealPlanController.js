@@ -98,7 +98,40 @@ const getMealPlansForWeek = async (req, res) => {
 	}
 }
 
+const deleteMealPlan = async (req, res) => {
+	console.log('Received request to delete meal plan:', req.body)
+	try {
+		const { userId, date, recipeId } = req.body.query
+
+		const filter = { userId, date, recipeId }
+
+		// Use deleteOne or findOneAndDelete method to delete the meal plan
+		const deletedMealPlan = await MealPlan.findOneAndDelete(filter)
+
+		if (!deletedMealPlan) {
+			return res.status(404).json({
+				message: 'Meal plan not found or already deleted.',
+			})
+		}
+
+		res.status(200).json({
+			message: 'Meal plan deleted successfully',
+		})
+	} catch (error) {
+		console.error('Error in deleting meal plan:', {
+			errorMessage: error.message,
+			errorStack: error.stack,
+			requestBody: req.body,
+		})
+		res.status(500).json({
+			message: 'Internal Server Error',
+			error: error.message,
+		})
+	}
+}
+
 module.exports = {
 	saveMealPlan,
 	getMealPlansForWeek,
+	deleteMealPlan,
 }

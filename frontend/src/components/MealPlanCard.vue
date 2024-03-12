@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps, ref, computed } from 'vue'
+import { defineProps, computed } from 'vue'
 import { startOfWeek, addDays, format } from 'date-fns'
 // import { useSavedRecipesStore } from '@/stores/savedRecipes.js'
 import { useMealPlanStore } from '@/stores/mealPlan.js'
@@ -70,6 +70,21 @@ async function saveSelectedMealPlan(recipe, meal, customDate) {
     console.error('Failed to save or update meal plan:', error)
   }
 }
+
+async function deleteMealPlan() {
+  // Extracting necessary information
+  const userId = props.loggedUser.id
+  const date = props.dayPlan.fullDate // Ensure this is in the correct format expected by the backend
+  const recipeId = props.recipe.recipeId // Assuming `props.mealPlan` has a `type` property that corresponds to meal types
+
+  try {
+    // Call the store's delete function with the proper parameters
+    await MealPlanStore.deleteMealPlan({ userId, date, recipeId })
+    updateMealPlansForWeek(props.selectedDate)
+  } catch (error) {
+    console.error('Failed to delete meal plan:', error)
+  }
+}
 </script>
 
 <template>
@@ -101,12 +116,14 @@ async function saveSelectedMealPlan(recipe, meal, customDate) {
             </ul>
           </details>
 
-          <RouterLink
+          <button
             v-else
-            to=""
+            @click="deleteMealPlan"
             class="btn rounded-l-md rounded-r-none w-1/2 z-[1] hover:bg-blue-400 bg-accent border-0 py-4"
-            >Remove
-          </RouterLink>
+          >
+            Remove
+          </button>
+
           <span class="bg-accent border-l-2"></span>
           <RouterLink
             to=""

@@ -48,7 +48,7 @@ export const useMealPlanStore = defineStore('mealPlan', {
       this.error = null
       try {
         const response = await fetch(
-          'https://www.thewebmasters.ca:4000/api/mealPlanRoutes/getmealplansforweek',
+          'https://www.thewebmasters.ca:4000/api/mealPlanRoutes/getmealplans',
           {
             method: 'POST',
             headers: {
@@ -70,6 +70,39 @@ export const useMealPlanStore = defineStore('mealPlan', {
         this.error = error.message
       } finally {
         this.isLoading = false
+      }
+    },
+    async deleteMealPlan({ userId, date, recipeId }) {
+      this.error = null
+      try {
+        const response = await fetch(
+          `https://www.thewebmasters.ca:4000/api/mealPlanRoutes/deletemealplan`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              query: { userId, date, recipeId }
+            })
+          }
+        )
+
+        if (!response.ok) {
+          // Handle HTTP errors
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+
+        const result = await response.json()
+        if (result.message === 'Meal plan deleted successfully') {
+          // Optional: Update mealPlans state to reflect deletion
+          // This requires you to adjust your state management accordingly
+        } else {
+          throw new Error('Meal plan deletion was unsuccessful')
+        }
+      } catch (error) {
+        console.error('Error deleting meal plan:', error.message)
+        this.error = error.message // Update the error state with the error message
       }
     }
   }
