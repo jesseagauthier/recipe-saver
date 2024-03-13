@@ -3,15 +3,14 @@ import { defineStore } from 'pinia'
 export const useMealPlanStore = defineStore('mealPlan', {
   state: () => ({
     allowedMeals: ['breakfast', 'lunch', 'dinner', 'snack'],
-    mealPlans: [], // This could be used to store meal plans fetched from the server
+    mealPlans: [],
     error: null,
-    isLoading: false // Add this line
-    // Adding an error state to track any errors
+    isLoading: false
   }),
   actions: {
     async saveMealPlan(mealPlanData) {
       console.log(mealPlanData)
-      this.error = null // Reset error state before trying to save a new meal plan
+      this.error = null
       try {
         const response = await fetch(
           'https://www.thewebmasters.ca:4000/api/mealPlanRoutes/savemeal',

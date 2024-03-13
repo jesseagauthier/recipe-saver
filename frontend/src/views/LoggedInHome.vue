@@ -8,6 +8,7 @@ import { useNewRecipesStore } from '@/stores/newRecipes'
 import { useSavedRecipesStore } from '@/stores/savedRecipes'
 import { useSearchRecipeStore } from '@/stores/searchRecipes'
 import { defineProps } from 'vue'
+import RecipeSearchBar from '@/components/RecipeSearchBar.vue'
 
 const props = defineProps({
   loggedUser: Object,
@@ -18,6 +19,10 @@ const props = defineProps({
 const newRecipesStore = useNewRecipesStore()
 const savedRecipesStore = useSavedRecipesStore()
 const searchRecipeStore = useSearchRecipeStore()
+
+const searchesForRecipes = function (searchQuery) {
+  localRecipes.value = searchRecipeStore.searchForRecipes(searchQuery)
+}
 
 // Create a local ref that will sync with searchRecipeStore's recipes
 const localRecipes = ref([])
@@ -43,6 +48,7 @@ const fullyFetched = ref(true)
 
 <template>
   <main v-if="isLoggedIn" id="logged_in_view">
+    <RecipeSearchBar @searchRecipeStore="searchesForRecipes" />
     <div
       class="grid grid-cols-12 gap-4 mt-5 grid-rows-1 shadow-md p-4 bg-base-200 rounded-lg mb-1 bordered"
       v-if="localRecipes.length > 0"
