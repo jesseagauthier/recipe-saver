@@ -66,6 +66,25 @@
   <div v-else class="text-center">
     <p>Loading recipe...</p>
   </div>
+  <div v-if="saveDelete" role="alert" class="alert alert-success w-[20%] b-0 relative">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      class="stroke-info shrink-0 w-6 h-6"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+      ></path>
+    </svg>
+    <span>Recipe Saved</span>
+    <div>
+      <button class="btn btn-sm btn-primary">Close</button>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -99,9 +118,13 @@ function initiateRecipeSave(recipe) {
   if (isSaved.value) {
     savedRecipesStore.deleteRecipe(recipe.id, userId.value)
     isSaved.value = false
+    // Function for tooltip alert
   } else {
     savedRecipesStore.saveRecipe(recipe, userId.value)
     isSaved.value = true
+    // Function for tooltip alert
   }
 }
+
+const saveDelete = ref(true)
 </script>

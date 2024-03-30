@@ -1,9 +1,10 @@
+<!-- eslint-disable vue/attribute-hyphenation -->
 <template>
   <div class="flex justify-between">
     <h2 class="text-2xl font-bold mb-5">Your Saved Recipes</h2>
   </div>
   <div class="shadow-md rounded-lg mb-1 bordered">
-    <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-3 p-3">
       <RecipeCard
         class="col-span-1 md:col-span-6 lg:col-span-4"
         v-for="recipe in savedRecipes"

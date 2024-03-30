@@ -3,6 +3,7 @@
 
 # Ignore specific directories (and their subdirectories)
 node_modules/
+firebase_front/
 dist/
 build/
 .tmp/

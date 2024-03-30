@@ -47,7 +47,7 @@ const fullyFetched = ref(true)
 </script>
 
 <template>
-  <main v-if="isLoggedIn" id="logged_in_view">
+  <main class="m-h-screen" v-if="isLoggedIn" id="logged_in_view">
     <RecipeSearchBar @searchRecipeStore="searchesForRecipes" />
     <div
       class="grid grid-cols-12 gap-4 mt-5 grid-rows-1 shadow-md p-4 bg-base-200 rounded-lg mb-1 bordered"
