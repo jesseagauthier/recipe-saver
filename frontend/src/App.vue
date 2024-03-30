@@ -68,17 +68,15 @@ const logout = () => {
 </script>
 
 <template>
-  <div>
-    <main v-if="!isLoggedIn" class="p-3">
+  <div class="w-[95vw] mx-auto">
+    <main v-if="!isLoggedIn" class="p-3 mx-auto w-[100%]">
       <NotLoggedInView :isKindeReady="isKindeReady" :login="login" :register="register" />
     </main>
-    <main v-if="isLoggedIn" id="logged_in_view" class="">
+    <div v-if="isLoggedIn" id="logged_in_view">
       <isLoggedHeader :loggedUser="loggedUser" />
-      <main class="px-3 md:px-6">
-        <RouterView :loggedUser="loggedUser" :logout="logout" :isLoggedIn="isLoggedIn" />
-      </main>
+      <RouterView :loggedUser="loggedUser" :logout="logout" :isLoggedIn="isLoggedIn" />
       <isLoggedFooter :loggedUser="loggedUser" :logout="logout" />
-    </main>
+    </div>
   </div>
 </template>
 

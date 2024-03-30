@@ -1,23 +1,25 @@
 <template>
-  <header class="bg-base-100">
+  <header>
     <!-- Mobile Navigation -->
-    <nav class="lg:hidden flex justify-between items-center fixed z-[999]">
+    <nav class="lg:hidden flex justify-between items-center fixed z-[9999] top-0 right-0 left-0">
       <div
         :class="{
           'w-screen': isDropdownOpen,
-          'w-[50px]': !isDropdownOpen,
+          'w-[65px]': !isDropdownOpen,
           'h-screen': isDropdownOpen,
           'bg-[#f7f4e7]': isDropdownOpen,
           'bg-[#e6e4bf]': !isDropdownOpen
         }"
-        class="relative flex flex-col gap-3 max-w-[400px] z-[99999] p-4"
+        class="absolute top-0 right-0 flex p-2 flex-col gap-3 max-w-[400px] z-[99999]"
+        ref="dropdownContent"
       >
         <svg
           @click="isDropdownOpen = !isDropdownOpen"
           :class="{ 'scale-150': !isDropdownOpen, 'scale-100': isDropdownOpen }"
-          class="w-[49px] cursor-pointer"
+          class="w-[60px] h-[60px] cursor-pointer"
           viewBox="0 0 24 24"
           fill="none"
+          style="transform: translateX(-10%)"
         >
           <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
           <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
@@ -44,6 +46,7 @@
         </div>
       </div>
     </nav>
+    <!-- Desktop Navigation -->
     <nav class="hidden lg:flex p-5 justify-between items-center z-[999] w-[80vw] mx-auto">
       <!-- Navbar for larger screens -->
       <div class="flex items-center justify-around w-[100%]">
@@ -70,19 +73,16 @@ const props = defineProps({
   loggedUser: Object
 })
 
-const isDropdownOpen = ref(false) // State to track if the dropdown is open
-const route = useRoute() // Access the current route
+const isDropdownOpen = ref(false)
+const route = useRoute()
+const dropdownContent = ref(null)
 
-// Watch for route changes. Whenever the route changes, close the dropdown if it's open.
+// Watch for route changes and close the dropdown if it's open
 watch(route, () => {
   if (isDropdownOpen.value) {
     isDropdownOpen.value = false
   }
 })
-
-// Optional: If you need to handle clicks outside the dropdown to close it
-// This can complement the route change watch for closing the dropdown.
-const dropdownContent = ref(null)
 
 function handleClickOutside(event) {
   if (
@@ -95,7 +95,7 @@ function handleClickOutside(event) {
 }
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside, true) // Use capture mode
+  document.addEventListener('click', handleClickOutside, true)
 })
 
 onBeforeUnmount(() => {

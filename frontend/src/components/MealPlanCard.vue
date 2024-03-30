@@ -126,7 +126,7 @@ async function deleteMealPlan() {
 
           <span class="bg-accent border-l-2"></span>
           <RouterLink
-            to=""
+            :to="`/recipes/${recipe.recipeId}/${loggedUser.id}/saved`"
             class="z-[1] btn rounded-r-md rounded-l-none w-1/2 hover:bg-blue-400 bg-accent border-0"
             >Manage
           </RouterLink>
