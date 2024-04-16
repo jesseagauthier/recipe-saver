@@ -60,21 +60,21 @@ app.use((err, req, res, next) => {
 	res.status(500).send('Something broke!')
 })
 
-// HTTPS Server Setup
-const httpsOptions = {
-	key: fs.readFileSync(process.env.HTTPS_KEY_PATH),
-	cert: fs.readFileSync(process.env.HTTPS_CERT_PATH),
-}
+// // HTTPS Server Setup
+// const httpsOptions = {
+// 	key: fs.readFileSync(process.env.HTTPS_KEY_PATH),
+// 	cert: fs.readFileSync(process.env.HTTPS_CERT_PATH),
+// }
 
-const httpsServer = https.createServer(httpsOptions, app)
+// const httpsServer = https.createServer(httpsOptions, app)
 
 const port = process.env.PORT || 4000
 httpsServer.listen(port, () => {
 	console.log(`HTTPS Server is running on port ${port}`)
 })
 
-// Serve index.html for all other requests
-app.get('*', (req, res) => {
-	consolelog('serving index.html')
-	res.sendFile('index.html', { root: 'public' })
-})
+// // Serve index.html for all other requests
+// app.get('*', (req, res) => {
+// 	consolelog('serving index.html')
+// 	res.sendFile('index.html', { root: 'public' })
+// })
