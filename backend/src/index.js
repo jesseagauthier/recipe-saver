@@ -28,21 +28,23 @@ const corsOptions = {
 			callback(new Error('Not allowed by CORS')) // Disallow the request
 		}
 	},
-	methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE', 'PATCH'], // Include other methods as needed
-	allowedHeaders: ['Content-Type', 'Number'], // Specify allowed headers
+	methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE', 'PATCH'],
+	allowedHeaders: ['Content-Type', 'Number'],
 	exposeHeaders: [
 		'x-api-quota-request',
 		'x-api-quota-used',
 		'x-api-quota-left',
-	], // Expose custom headers
-	optionsSuccessStatus: 200, // Some legacy browsers (IE11, various SmartTVs) choke on 204
+	],
+	optionsSuccessStatus: 200,
 }
 
 // Middlewares
 app.use(cors(corsOptions))
-
 app.use(express.json())
 app.use(morgan(':date[iso] :method :url :status :response-time ms'))
+
+// Serve static files from the public directory
+app.use(express.static('public'))
 
 // Database Connection
 connectDB()
@@ -71,6 +73,8 @@ httpsServer.listen(port, () => {
 	console.log(`HTTPS Server is running on port ${port}`)
 })
 
-app.get('/', (req, res) => {
-	res.send('unauthorized')
+// Serve index.html for all other requests
+app.get('*', (req, res) => {
+	consolelog('serving index.html')
+	res.sendFile('index.html', { root: 'public' })
 })

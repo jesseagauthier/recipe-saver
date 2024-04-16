@@ -3,10 +3,10 @@
 
 # Ignore specific directories (and their subdirectories)
 node_modules/
-firebase_front/
 dist/
 build/
 .tmp/
+firebase_front/
 
 # Ignore specific file types in any folder
 *.tmp
